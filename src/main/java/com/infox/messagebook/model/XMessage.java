@@ -1,8 +1,6 @@
 package com.infox.messagebook.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
@@ -14,10 +12,7 @@ import java.util.HashMap;
  * rongrong.chen@alcatel-sbell.com.cn
  */
 @Entity
-public class XMessage implements Serializable {
-
-    @Id
-    private Long id ;
+public class XMessage extends XObject {
     
     private String content = null;
     private Date time = null;

@@ -12,9 +12,9 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
  * Time: 16:36
  * rongrong.chen@alcatel-sbell.com.cn
  */
-@Configuration
-@ComponentScan
-@EnableWebMvc
+//@Configuration
+//@ComponentScan
+//@EnableWebMvc
 public class AjaxConfig {
     private Logger logger = LoggerFactory.getLogger(AjaxConfig.class);
 

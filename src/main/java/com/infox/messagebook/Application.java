@@ -11,7 +11,7 @@ import org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfigura
 //@SpringBootApplication(scanBasePackages = {"infox.itmanager6.boot","infox.itmanager6.web.controller"})
 
 //@SpringBootApplication(exclude=DispatcherServletAutoConfiguration.class,scanBasePackages = {"infox.itmanager6.boot"})
-@SpringBootApplication(exclude=DispatcherServletAutoConfiguration.class,scanBasePackages = {"com.infox.messagebook"})
+@SpringBootApplication(scanBasePackages = {"com.infox.messagebook"})
 // 开启缓存请把下行取消注释
 //@EnableCaching
 public class Application {

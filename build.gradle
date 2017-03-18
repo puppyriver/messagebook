@@ -11,6 +11,31 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+//    println 'configuration!!!'
+    nodeps
+    println configurations.getNames()
+//    println nodeps.files.size()
+}
+
+task nodepsJar(type: Jar) {
+    appendix = 'nodeps'
+    from sourceSets.main.output
+    //exclude('**/*.jar')
+}
+
+task nodeps(type: BootRepackage, dependsOn: nodepsJar) {
+    //new Exception().printStackTrace()
+    withJarTask = nodepsJar
+    //  println configurations.nodeps.files.size()
+    customConfiguration = "nodeps"
+}
+
+task download(type: Copy) {
+    from configurations.compile
+    into 'deplibs' //下载后存放jar包的位置
+}
+
 dependencies {
 
     compile  "org.springframework.boot:spring-boot-starter-web:1.4.0.RELEASE"

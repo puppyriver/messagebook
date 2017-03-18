@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 
 
 /**
- * @author Raysmond<i@raysmond.com>.
+ * @author
  */
 @Configuration
 public class WebConfig extends WebMvcConfigurerAdapter {

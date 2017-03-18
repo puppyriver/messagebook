@@ -1,5 +1,6 @@
 package com.infox.messagebook.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.infox.messagebook.model.XMessage;
 import com.infox.messagebook.repository.XMessageRepository;
 import org.slf4j.Logger;
@@ -11,7 +12,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.URLDecoder;
+import java.util.*;
 
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
@@ -33,7 +37,42 @@ public class MessageControler {
     @RequestMapping(value = "{userName}", method = {POST,GET})
     public @ResponseBody
     List<XMessage> showList(@PathVariable String userName, @RequestParam(defaultValue = "1") int page, Model model ) {
+//        XMessage message = new XMessage();
+//        message.setId(1l);
+//        message.setContent("ronnieronnie");
+//        List list = Arrays.asList(message);
+//
+//        return list;
         return xMessageRepository.findAll();
+    }
+
+    @RequestMapping(value = "save", method = {POST,GET})
+    public  @ResponseBody XMessage save(@RequestParam Map request,@RequestParam String message) {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            message = URLDecoder.decode(message,"utf-8");
+            XMessage xmessage = objectMapper.readValue(message,XMessage.class);
+            xmessage.setTime(new Date());
+            return xMessageRepository.save(xmessage);
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return null;
+    }
+
+    @RequestMapping(value = "delete", method = {POST,GET})
+    public  @ResponseBody XMessage save(@RequestParam Map request,@RequestParam Long messageId) {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+//            message = URLDecoder.decode(message,"utf-8");
+//            XMessage xmessage = objectMapper.readValue(message,XMessage.class);
+             xMessageRepository.delete(messageId);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+        return null;
     }
 
     

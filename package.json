@@ -6,6 +6,8 @@
     "index": "./src/main/js/entry/index.jsx"
   },
   "dependencies": {
+    "preact": "^7.2.0",
+    "preact-compat": "^3.14.2",
     "react": "^15.3.0",
     "react-dom": "^15.3.0"
   },
