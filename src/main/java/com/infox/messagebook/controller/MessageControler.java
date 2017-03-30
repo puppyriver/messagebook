@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +44,7 @@ public class MessageControler {
 //        List list = Arrays.asList(message);
 //
 //        return list;
-        return xMessageRepository.findAll();
+        return xMessageRepository.findAll(new Sort(Sort.Direction.DESC,"time"));
     }
 
     @RequestMapping(value = "save", method = {POST,GET})
