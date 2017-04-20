@@ -1,5 +1,7 @@
 package com.infox.messagebook.controller;
 
+import com.infox.messagebook.utils.EventManager;
+import com.infox.messagebook.utils.SysUtil;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -27,14 +29,14 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Controller
 @RequestMapping("/file/*")
-public class FileController extends AbstractAjaxController {
+public class FileController{
     private Logger logger = LoggerFactory.getLogger(FileController.class);
 
     @RequestMapping(value="poll")
     public @ResponseBody
     HashMap poll(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-        return commonPoll(request,response);
+        return null;
+        //return commonPoll(request,response);
     }
     @RequestMapping(value="upload")
     public @ResponseBody
@@ -102,22 +104,7 @@ public class FileController extends AbstractAjaxController {
                 }
 
 
-                if (key != null && key.equals("virus")) {
-                        new CusEventsImporter(storeFiles ,group).start();
-                }  else {
-
-                    Thread t = new Thread() {
-                        public void run() {
-                            try {
-                                new EventsLogImporter(group).importData(storeFiles, R_Customer.class);
-                            } catch (Exception e) {
-                                logger.error(e.getMessage(), e);
-                            }
-                            EventManager.getInstance().groupEnd(group);
-                        }
-                    };
-                    t.start();
-                }
+                EventManager.getInstance().groupEnd(group);
             }
         } catch (Exception ex) {
             request.setAttribute("message",

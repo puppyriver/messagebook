@@ -60,7 +60,16 @@ export default class MessageBookMain extends React.Component {
         // let msgBtnStyle={float : 'right'};
         let editMessage = this.state.editMessage;
         return (<div>
-            <div className="row">
+            <div className="nav">
+                <h1 className="nav-logo">Message Book</h1>
+                <a className="nav-item" href="#">Item</a>
+                <a className="nav-item" href="#">Item</a>
+                <a className="nav-item" href="#">Item</a>
+            </div>
+            <div style={{marginTop : 10}}   className="row">
+                <div className="col-1">
+                   
+                </div>
                 <div className="col-10">
                     <textarea
                         type="text" placeholder=".."
@@ -70,13 +79,14 @@ export default class MessageBookMain extends React.Component {
                                 editMessage : {...editMessage,content : e.target.value}
                             });
                         }}
-                        style={{height : "100%"}}
+                        // style={{height : "100%"}}
+                        
                         rows={((!editMessage.content || editMessage.content.indexOf('\n')==-1)?10:(editMessage.content.match(/\n/gi)).length+1)}
                     >
                     </textarea>
 
                 </div>
-                <div className="col-2">
+                <div className="col-1">
                     <button  onClick={this.save}>保存</button>
                 </div>
             </div>
@@ -85,11 +95,6 @@ export default class MessageBookMain extends React.Component {
            })} deleter = {this.delete}/>
         </div>);
     }
-
-
-
-
-
 }
 
 MessageBookMain.propTypes = {

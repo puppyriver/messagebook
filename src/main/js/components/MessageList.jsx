@@ -37,18 +37,24 @@ export default class MessageList extends React.Component {
         let msgBtnStyle={float : 'right'};
         return (<div>
             {
-                messages && messages.map(
-                    m => <div className="row">
-                        <div className="col-10">
-                            <pre><code>{m.content}</code></pre>
-
-                        </div>
-                        <div className="col-2">
+                messages && messages.map(m =>
+                    <div  style={{marginTop : 0}}  className="row">
+                        <div className="col-1">
                             {m.time && new Date(m.time).toLocaleString()}
-                            <button onClick={()=>this.props.editor(m)}>编辑</button>
-                            <button onClick={()=>this.props.deleter(m)}>删除</button>
                         </div>
-                    </div>
+                        <div className="col-10">
+                            <pre style={{margin : 2}}>
+
+                                <code  style={{margin : 0}}>
+                                    {m.content}
+                                </code>
+                            </pre>
+                        </div>
+                        <div className="col-1">
+                            <button style={{margin : 0,padding : 2}}  onClick={()=>this.props.editor(m)}>编辑</button>
+                            <button  style={{margin : 0,marginLeft : 5,padding : 2}}  onClick={()=>this.props.deleter(m)}>删除</button>
+                        </div>
+                    </div>                                  
                 )
             }
         </div>);
