@@ -8,9 +8,11 @@ import React from 'react';
 // import '../lib/bijou.min.css'
 import '../lib/wing.min.css'
 import MessageBookMain from '../modules/MessageBookMain.jsx'
+import FileManagerMain from '../modules/FileManagerMain.jsx'
 
 var div = document.getElementById('react-content');
 var module = div.getAttribute("module");
 
 if (module == 'main') ReactDOM.render(<MessageBookMain/>,div);
+if (module == 'files') ReactDOM.render(<FileManagerMain/>,div);
 

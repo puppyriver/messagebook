@@ -1,5 +1,6 @@
 package com.infox.messagebook.controller;
 
+import com.infox.messagebook.api.FileInfo;
 import com.infox.messagebook.utils.EventManager;
 import com.infox.messagebook.utils.SysUtil;
 import org.apache.commons.fileupload.FileItem;
@@ -9,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +33,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RequestMapping("/file/*")
 public class FileController{
     private Logger logger = LoggerFactory.getLogger(FileController.class);
+    @RequestMapping(value="list")
+    public @ResponseBody FileInfo list(@RequestParam(defaultValue = ".") String path) {
+        FileInfo fileInfo = new FileInfo(new File(path),true);
+        return fileInfo;
+    }
+
+    @RequestMapping(value="download")
+    public @ResponseBody FileInfo download(@RequestParam(defaultValue = ".") String path,
+                                           HttpServletRequest request,
+                                           HttpServletResponse response) {
+        FileInfo fileInfo = new FileInfo(new File(path),true);
+        return fileInfo;
+    }
+
 
     @RequestMapping(value="poll")
     public @ResponseBody
