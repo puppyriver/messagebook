@@ -90,7 +90,7 @@ export default class FileManagerMain extends React.Component {
                     var percent = 100 * ev.loaded/ev.total;
                     console.log(percent,ev)
                     this.setState({
-                        upload: {...this.state.upload,progress : percent,label : `${ev.loaded}bytes/${ev.total}bytes`}
+                        upload: {...this.state.upload,progress : percent,label : `${ev.loaded}/${ev.total} bytes`}
                         //    now : parseInt(percent),
                         //   label : '正在上传文件:'+this.state.files[idx].name+" "+parseInt(ev.loaded / 1024)+"kb/"+parseInt(ev.total/1024)+"kb"
                     });
