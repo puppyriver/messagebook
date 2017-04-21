@@ -87,7 +87,8 @@ export default class FileManagerMain extends React.Component {
             xhr.upload.onprogress =   (ev)=>{
                 console.log('======onprogress')
                 if(ev.lengthComputable) {
-                    var percent = 100 * ev.loaded/ev.total;
+                    var percent = parseInt(100 * ev.loaded/ev.total);
+
                     console.log(percent,ev)
                     this.setState({
                         upload: {...this.state.upload,progress : percent,label : `${parseInt(ev.loaded/1000)}/${parseInt(ev.total/1000)} kb`}
