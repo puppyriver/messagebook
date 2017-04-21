@@ -44,7 +44,7 @@ export default class FileManagerMain extends React.Component {
     list = (path=this.state.path)=> {
 
         Ajax.post("ajax/file/list",{path : path},result=>{
-            this.setState({path : path,fileInfo : result})
+            this.setState({path : result.absolutePath,fileInfo : result})
         })
     }
 
@@ -77,7 +77,7 @@ export default class FileManagerMain extends React.Component {
 
             xhr.upload.onload = ()=>{
                 console.log('=====finish uploading')
-                this.list();
+
             }
             xhr.upload.onloadstart =  (evt1,evt2)=>{
                 console.log(evt1);
@@ -99,6 +99,7 @@ export default class FileManagerMain extends React.Component {
 
             xhr.onload = function() {
                 console.log(`xhr onload success !`);
+                this.list();
                 //success(xhr.response);
             };
             xhr.send(data);
@@ -120,9 +121,8 @@ export default class FileManagerMain extends React.Component {
         return (<div>
             <div className="nav">
                 <h1 className="nav-logo">Message Book</h1>
-                <a className="nav-item" href="#">Item</a>
-                <a className="nav-item" href="#">Item</a>
-                <a className="nav-item" href="#">Item</a>
+                <a className="nav-item" href="index.html">笔记管理</a>
+                <a className="nav-item" href="files.html">文件管理</a>
             </div>
             <div style={{marginTop : 10}}>
                 <div className="col-12">
@@ -153,8 +153,8 @@ export default class FileManagerMain extends React.Component {
                                     <a>上传文件</a>
                                </span>
                             </label>
-                            <a style={{marginLeft : 10}}>新建文件夹</a>
-                            <a style={{marginLeft : 10}} onClick={this.list}>刷新</a>
+                            <a style={{marginLeft : 10}} onClick={()=>this.setState({dialog : "open"})}>新建文件夹</a>
+                            <a style={{marginLeft : 10}} onClick={()=>this.list()}>刷新</a>
                         </span>
                     </span>
 
@@ -162,6 +162,28 @@ export default class FileManagerMain extends React.Component {
                     <div style={{width : "80%",marginBottom : 10,marginTop : 10}} className ="progress">
                         <span className={progress == 100 ? "green": "orange"} style={{width: progress+"%"}}><span>{upload.label+"   "+progress+"%"}</span></span>
                     </div>
+
+                    <dialog open = { this.state.dialog && "open"}>
+                        <div style={{paddingRight : 20}}>
+                            <input type="text" value={this.state.editFolderName} onChange={e=>{
+                                this.setState({editFolderName  : e.target.value})
+                            }}/>
+                            <button
+                                onClick={()=>{
+                                    Ajax.post("ajax/file/mkdir",{path : this.state.path,folderName : this.state.editFolderName},result=>{
+                                        this.setState({dialog : null});
+                                        this.list();
+                                    })
+                                }}
+                            >确定</button>
+                            <button
+                                onClick={()=>{
+                                    this.setState({dialog : null});
+                                }}
+                            >取消</button>
+                        </div>
+                    </dialog>
+
                     <table style={tableStyle} border="1">
                         <thead>
                             <th>Name</th>
@@ -178,27 +200,28 @@ export default class FileManagerMain extends React.Component {
                                     <td>{info.directory ?
                                         <a onClick={()=>{
                                             this.list(info.absolutePath);
-                                        }}>{`[${info.name}]`}</a> : <a  href="#">
+                                        }}>{`[${info.name}]`}</a> : <a  href={"ajax/file/download?path="+info.absolutePath}>
                                             <b>{info.name}</b></a>}
                                     </td>
                                     <td>{info.directory ?
-                                        "":
-                                        <a href={"ajax/file/download?path="+info.absolutePath}>下载</a>}
+                                        "": <a href={"ajax/file/download?path="+info.absolutePath}>下载</a>}
                                     </td>
-                                    <td><a onClick={()=>{
-                                                Ajax.post("ajax/file/delete?path="+info.absolutePath,{},this.list)
+                                    <td>{info.name == '..' ?
+                                        "": <a onClick={()=>{
+                                                Ajax.post("ajax/file/delete?path="+info.absolutePath,{},()=>{this.list()})
                                             }}
                                          >
                                          删除
-                                         </a>
+                                         </a>}
                                     </td>
                                     <td>{info.size}</td>
-                                    <td>{info.time}</td>
+                                    <td>{new Date(info.time).toLocaleString()}</td>
 
                                 </tr>)
                         }
                         </tbody>
                     </table>
+
                 </div>
             </div>
         </div>);

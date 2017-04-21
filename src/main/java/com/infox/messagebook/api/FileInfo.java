@@ -23,6 +23,10 @@ public class FileInfo implements Serializable {
 
     }
     public FileInfo(File file,boolean subFiles) {
+        this(file,subFiles,true);
+    }
+
+    public FileInfo(File file,boolean subFiles,boolean containsParent) {
         this.file = file;
 
         if (file.exists()) {
@@ -36,9 +40,11 @@ public class FileInfo implements Serializable {
                         .map(f -> new FileInfo(f,false))
                         .collect(Collectors.toList());
                 this.subFiles.sort((c1,c2)-> c1.isDirectory ? -1 : 1);
-                FileInfo parent = new FileInfo(file.getParentFile(), false);
-                parent.setName("..");
-                this.subFiles.add(0, parent);
+                if (containsParent) {
+                    FileInfo parent = new FileInfo(file.getParentFile(), false);
+                    parent.setName("..");
+                    this.subFiles.add(0, parent);
+                }
             }
 
         }

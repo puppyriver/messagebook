@@ -62,9 +62,8 @@ export default class MessageBookMain extends React.Component {
         return (<div>
             <div className="nav">
                 <h1 className="nav-logo">Message Book</h1>
-                <a className="nav-item" href="#">Item</a>
-                <a className="nav-item" href="#">Item</a>
-                <a className="nav-item" href="#">Item</a>
+                <a className="nav-item" href="index.html">笔记管理</a>
+                <a className="nav-item" href="files.html">文件管理</a>
             </div>
             <div style={{marginTop : 10}}   className="row">
                 <div className="col-1">

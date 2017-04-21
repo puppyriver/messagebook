@@ -35,6 +35,10 @@ public class JsonResponse implements Serializable ,Cloneable{
         this.data = data;
     }
 
+    public static JsonResponse SUCCESS() {
+        return new JsonResponse(JsonResponse.STATUS_SUCCESS,"success");
+    }
+
     public int getStatus() {
         return status;
     }

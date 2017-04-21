@@ -50,8 +50,25 @@ public class FileController{
             path = URLDecoder.decode(path,"utf-8");
             if (path.isEmpty())
                 path = base.getAbsolutePath();
-            FileInfo fileInfo = new FileInfo(new File(path),true);
+            FileInfo fileInfo = new FileInfo(new File(path),true,!path.equals(base.getAbsolutePath()));
             return fileInfo;
+        } catch (UnsupportedEncodingException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return null;
+
+    }
+
+    @RequestMapping(value="mkdir")
+    public @ResponseBody JsonResponse mkdir(@RequestParam(defaultValue = "") String path,
+                                            @RequestParam(defaultValue = "") String folderName,HttpServletRequest request,HttpServletResponse response) {
+        try {
+            path = URLDecoder.decode(path,"utf-8");
+            if (path.isEmpty())
+                path = base.getAbsolutePath();
+            File newFile = new File(path,folderName);
+            if (!newFile.exists()) newFile.mkdirs();
+            return JsonResponse.SUCCESS();
         } catch (UnsupportedEncodingException e) {
             logger.error(e.getMessage(), e);
         }
