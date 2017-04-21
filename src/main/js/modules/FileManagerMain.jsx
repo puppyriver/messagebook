@@ -97,7 +97,7 @@ export default class FileManagerMain extends React.Component {
                 }
             }
 
-            xhr.onload = function() {
+            xhr.onload = ()=> {
                 console.log(`xhr onload success !`);
                 this.list();
                 //success(xhr.response);
