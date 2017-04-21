@@ -7,6 +7,8 @@ import React from 'react';
 // import 'purecss/build/tables-min.css'
 // import '../lib/bijou.min.css'
 import '../lib/wing.min.css'
+import '../lib/table.css'
+
 import MessageBookMain from '../modules/MessageBookMain.jsx'
 import FileManagerMain from '../modules/FileManagerMain.jsx'
 

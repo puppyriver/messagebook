@@ -17,6 +17,7 @@ public class FileInfo implements Serializable {
     private String name;
     private Date time;
     private long size;
+    private String absolutePath;
 
     public FileInfo() {
 
@@ -29,14 +30,26 @@ public class FileInfo implements Serializable {
             this.name = file.getName();
             this.time = new Date(file.lastModified());
             this.size = file.length();
-
+            this.absolutePath = file.getAbsolutePath();
             if (subFiles && file.isDirectory()) {
                 this.subFiles = Arrays.asList(file.listFiles()).stream()
                         .map(f -> new FileInfo(f,false))
                         .collect(Collectors.toList());
+                this.subFiles.sort((c1,c2)-> c1.isDirectory ? -1 : 1);
+                FileInfo parent = new FileInfo(file.getParentFile(), false);
+                parent.setName("..");
+                this.subFiles.add(0, parent);
             }
 
         }
+    }
+
+    public String getAbsolutePath() {
+        return absolutePath;
+    }
+
+    public void setAbsolutePath(String absolutePath) {
+        this.absolutePath = absolutePath;
     }
 
     public File getFile() {

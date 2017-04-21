@@ -1,6 +1,7 @@
 package com.infox.messagebook.controller;
 
 import com.infox.messagebook.api.FileInfo;
+import com.infox.messagebook.api.JsonResponse;
 import com.infox.messagebook.utils.EventManager;
 import com.infox.messagebook.utils.SysUtil;
 import org.apache.commons.fileupload.FileItem;
@@ -12,11 +13,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,18 +36,66 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RequestMapping("/file/*")
 public class FileController{
     private Logger logger = LoggerFactory.getLogger(FileController.class);
-    @RequestMapping(value="list")
-    public @ResponseBody FileInfo list(@RequestParam(defaultValue = ".") String path) {
-        FileInfo fileInfo = new FileInfo(new File(path),true);
-        return fileInfo;
+    private File base = null;
+
+    public FileController () {
+        base = new File(System.getProperty("files.rootDir","files"));
+        if (!base.exists())
+            base.mkdirs();
     }
+
+    @RequestMapping(value="list")
+    public @ResponseBody FileInfo list(@RequestParam(defaultValue = "") String path) {
+        try {
+            path = URLDecoder.decode(path,"utf-8");
+            if (path.isEmpty())
+                path = base.getAbsolutePath();
+            FileInfo fileInfo = new FileInfo(new File(path),true);
+            return fileInfo;
+        } catch (UnsupportedEncodingException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return null;
+
+    }
+
+    @RequestMapping(value="delete")
+    public @ResponseBody
+    JsonResponse delete(@RequestParam(defaultValue = "") String path) {
+        File file = new File(path);
+        boolean b = file.delete();
+        return new JsonResponse(JsonResponse.STATUS_SUCCESS,"success");
+
+    }
+
 
     @RequestMapping(value="download")
     public @ResponseBody FileInfo download(@RequestParam(defaultValue = ".") String path,
                                            HttpServletRequest request,
                                            HttpServletResponse response) {
-        FileInfo fileInfo = new FileInfo(new File(path),true);
-        return fileInfo;
+
+        try {
+            File file = new File(path);
+            response.setContentType("text/plain");
+            response.setHeader("Location",file.getName());
+            response.setHeader("Content-Disposition", "attachment; filename=" + file.getName());
+            OutputStream outputStream = response.getOutputStream();
+            InputStream inputStream = new FileInputStream(file);
+            byte[] buffer = new byte[1024];
+            int i = -1;
+            while ((i = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, i);
+            }
+            outputStream.flush();
+            outputStream.close();
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+        }
+        return null;
+
+//        FileInfo fileInfo = new FileInfo(new File(path),true);
+//        return fileInfo;
     }
 
 
@@ -56,12 +107,11 @@ public class FileController{
     }
     @RequestMapping(value="upload")
     public @ResponseBody
-    HashMap upload(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    HashMap upload(@RequestParam(defaultValue = "") String path,HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (path.isEmpty())
+            path = base.getAbsolutePath();
         HashMap map = new HashMap();
         String key = request.getParameter("key");
-
-
-
         // 配置上传参数
         DiskFileItemFactory factory = new DiskFileItemFactory();
         // 设置内存临界值 - 超过后将产生临时文件并存储于临时目录中
@@ -79,49 +129,47 @@ public class FileController{
 
         // 构造临时路径来存储上传的文件
         // 这个路径相对当前应用的目录
-        String uploadPath = request.getServletContext().getRealPath("/") + File.separator +"uploads";
+    //    String uploadPath = request.getServletContext().getRealPath("/") + File.separator +"uploads";
 
 
         // 如果目录不存在则创建
-        File uploadDir = new File(uploadPath);
+        File uploadDir = new File(path);
         if (!uploadDir.exists()) {
             uploadDir.mkdir();
         }
 
         try {
-            // 解析请求的内容提取文件数据
-            @SuppressWarnings("unchecked")
-            List<FileItem> formItems = upload.parseRequest(request);
-            List<File> storeFiles = new ArrayList<>();
-            if (formItems != null && formItems.size() > 0) {
-                String group = SysUtil.nextDN();
-                EventManager.getInstance().addGroup(group);
-                // 迭代表单数据
-                for (FileItem item : formItems) {
-                    // 处理不在表单中的字段
-                    if (!item.isFormField()) {
-                        String fileName = new File(item.getName()).getName();
-                        String filePath = uploadPath + File.separator + fileName;
-                        File storeFile = new File(filePath);
-                        // 在控制台输出文件的上传路径
-                        System.out.println(filePath);
-                        // 保存文件到硬盘
-                        item.write(storeFile);
-                        map.put("result","success");
 
-                        map.put("group", group);
-
-                        storeFiles.add(storeFile);
-//                        request.setAttribute("message",
-//                                "文件上传成功!");
-
-
+            final String _path = path;
+            //  need define bean : org.springframework.web.multipart.commons.CommonsMultipartResolver
+            if (request instanceof org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest) {
+                Map<String, MultipartFile> fileMap = ((DefaultMultipartHttpServletRequest) request).getFileMap();
+                fileMap.values().forEach(file-> {
+                    File storeFile = getLocalFile(_path,file.getOriginalFilename());
+                    try {
+                        file.transferTo(storeFile);
+                    } catch (IOException e) {
+                        logger.error(e.getMessage(), e);
+                    }
+                });
+            } else {
+                // 解析请求的内容提取文件数据
+                @SuppressWarnings("unchecked")
+                List<FileItem> formItems = upload.parseRequest(request);
+                List<File> storeFiles = new ArrayList<>();
+                if (formItems != null && formItems.size() > 0) {
+                    for (FileItem item : formItems) {
+                        if (!item.isFormField()) {
+                            File storeFile = getLocalFile(path,item.getName());
+                            item.write(storeFile);
+                            storeFiles.add(storeFile);
+                        }
                     }
                 }
-
-
-                EventManager.getInstance().groupEnd(group);
             }
+
+
+
         } catch (Exception ex) {
             request.setAttribute("message",
                     "错误信息: " + ex.getMessage());
@@ -140,6 +188,13 @@ public class FileController{
 
 
         return map;
+    }
+
+    private File getLocalFile(String path,String fileName) {
+        String uploadPath = path;
+        String filePath = uploadPath + File.separator + fileName;
+        File storeFile = new File(filePath);
+        return storeFile;
     }
 
 
