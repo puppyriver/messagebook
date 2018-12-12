@@ -25,6 +25,8 @@ public class TextMessageUtil {
         text.setContent(content == null ? "欢迎开始微信公众号" : content);
         text.setCreateTime(new Date().getTime());
         text.setMsgType("text");
-        return  this.messageToxml(text);
+        String msg =   this.messageToxml(text);
+
+        return msg.replaceAll(" ","");
     }
 }
