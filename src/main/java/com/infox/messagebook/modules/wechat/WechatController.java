@@ -1,9 +1,12 @@
 package com.infox.messagebook.modules.wechat;
 
 
+import com.infox.messagebook.model.XMessage;
+import com.infox.messagebook.repository.XMessageRepository;
 import com.infox.messagebook.utils.SHA1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Map;
 
@@ -23,6 +27,8 @@ import java.util.Map;
 @Controller
 @RequestMapping("/open/wechat/*")
 public class WechatController {
+    @Autowired
+    private XMessageRepository xMessageRepository;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
     @RequestMapping(value = "signature", method = {RequestMethod.GET,RequestMethod.POST})
@@ -63,12 +69,19 @@ public class WechatController {
             String MsgType = map.get("MsgType");
             String Content = map.get("Content");
 
+            XMessage xMessage = new XMessage();
+            xMessage.setTime(new Date());
+            xMessage.setContent(Content);
+            xMessageRepository.save(xMessage);
+
             TextMessageUtil textMessage = new TextMessageUtil();
-            String message = textMessage.initMessage(FromUserName, ToUserName);
+            String message = textMessage.initMessage(FromUserName, ToUserName,"消息已经保存");
             String content_exp = "<xml> <ToUserName><![CDATA["+ToUserName+"]]></ToUserName> <FromUserName><![CDATA["+FromUserName+"]]></FromUserName> <CreateTime>12345678</CreateTime> <MsgType><![CDATA[text]]></MsgType> <Content><![CDATA[你好ssssss]]></Content> </xml>";
+
 
             logger.info("content_exp:"+content_exp);
             logger.info("message:"+message);
+
             content_exp = message.replaceAll(" ","");
             response.setContentType("application/xml;charset=utf-8");
             response(content_exp,response);

@@ -18,11 +18,11 @@ public class TextMessageUtil {
      * @param FromUserName
      * @param ToUserName
      */
-    public  String initMessage(String FromUserName, String ToUserName) {
+    public  String initMessage(String FromUserName, String ToUserName,String content) {
         MessageText text = new MessageText();
         text.setToUserName(FromUserName);
         text.setFromUserName(ToUserName);
-        text.setContent("欢迎开始微信公众号");
+        text.setContent(content == null ? "欢迎开始微信公众号" : content);
         text.setCreateTime(new Date().getTime());
         text.setMsgType("text");
         return  this.messageToxml(text);
