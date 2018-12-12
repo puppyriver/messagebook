@@ -199,10 +199,26 @@ export default class FileManagerMain extends React.Component {
                             fileInfo && fileInfo.subFiles && fileInfo.subFiles
                                 .map(info=><tr>
                                     <td>{info.directory ?
-                                        <a onClick={()=>{
+                                        <a onClick={() => {
                                             this.list(info.absolutePath);
-                                        }}>{`[${info.name}]`}</a> : <a  href={"ajax/file/download?path="+info.absolutePath}>
-                                            <b>{info.name}</b></a>}
+                                        }}>{`[${info.name}]`}</a> :
+                                        ((info.name.toLowerCase().endsWith(".png")
+                                            || info.name.toLowerCase().endsWith(".jpg")
+                                            || info.name.toLowerCase().endsWith(".jpeg")
+                                            || info.name.toLowerCase().endsWith(".gif")) ?
+                                            <a><img style={{width : 60}}
+                                                    src={"ajax/file/get_img?thumbnail=true&path="+window.btoa(info.absolutePath)}
+                                                    onClick={()=>{
+                                                        let url = "ajax/file/get_img?thumbnail=false&path="+window.btoa(info.absolutePath);
+                                                        window.open(url);
+                                                        // var _win = window.open('about:blank','_blank');
+                                                        // _win.location.href = url;
+                                                    }}
+                                            />
+                                            </a> : <a href={"ajax/file/download?path=" + info.absolutePath}>
+                                                <b>{info.name}</b></a>)
+                                    }
+
                                     </td>
                                     <td>{info.directory ?
                                         "": <a href={"ajax/file/download?path="+info.absolutePath}>下载</a>}

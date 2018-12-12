@@ -2,13 +2,16 @@ package com.infox.messagebook.controller;
 
 import com.infox.messagebook.api.FileInfo;
 import com.infox.messagebook.api.JsonResponse;
+import com.infox.messagebook.services.ImageService;
 import com.infox.messagebook.utils.EventManager;
+import com.infox.messagebook.utils.ResizeImage;
 import com.infox.messagebook.utils.SysUtil;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,10 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -37,6 +37,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class FileController{
     private Logger logger = LoggerFactory.getLogger(FileController.class);
     private File base = null;
+
+    @Autowired
+    private ImageService imageService = null;
 
     public FileController () {
         base = new File(System.getProperty("files.rootDir","files"));
@@ -115,6 +118,54 @@ public class FileController{
 //        return fileInfo;
     }
 
+    @RequestMapping(value="get_img")
+    public void getImg(@RequestParam(defaultValue = ".") String path,
+                       @RequestParam(defaultValue = "true") String thumbnail,
+                                           HttpServletRequest request,
+                                           HttpServletResponse response) {
+        InputStream inputStream = null;
+        try {
+              path = new String(Base64.getDecoder().decode(path));
+            File file = new File(path);
+
+            response.setContentType("image/png");
+//            response.setHeader("Location",file.getName());
+//            response.setHeader("Content-Disposition", "attachment; filename=" + file.getName());
+            OutputStream outputStream = response.getOutputStream();
+
+
+
+            if (thumbnail.equals("true")) {
+//                byte[] smallImage = new ResizeImage().getSmallImage(file);
+//                inputStream = new ByteArrayInputStream(smallImage);
+
+                inputStream = imageService.getThumbnail(file);
+            } else {
+                inputStream = new FileInputStream(file);
+            }
+            System.out.println(inputStream.available());
+            byte[] buffer = new byte[1024];
+            int i = -1;
+            while ((i = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, i);
+            }
+
+            outputStream.flush();
+            outputStream.close();
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                logger.error(e.getMessage(),e);
+            }
+        }
+
+
+//        FileInfo fileInfo = new FileInfo(new File(path),true);
+//        return fileInfo;
+    }
 
     @RequestMapping(value="poll")
     public @ResponseBody
