@@ -21,7 +21,8 @@ public class ImageService {
 
     public void createThumbnail (File file) throws IOException {
         Thumbnails.of(file).size(200,200)
-                .outputFormat("jpg").toFile(new File(thumbnails,file.getName()));
+//                .outputFormat("jpg")
+                .toFile(new File(thumbnails,file.getName()));
 
     }
     public FileInputStream getThumbnail(File file) throws IOException {
@@ -33,5 +34,9 @@ public class ImageService {
             tb = new File(thumbnails,file.getName());
             return new FileInputStream(tb);
         }
+    }
+
+    public static void main(String[] args) throws IOException {
+        new ImageService().createThumbnail(new File("d:\\aaa.png"));
     }
 }
