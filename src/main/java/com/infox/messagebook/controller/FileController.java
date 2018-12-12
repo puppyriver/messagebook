@@ -4,7 +4,7 @@ import com.infox.messagebook.api.FileInfo;
 import com.infox.messagebook.api.JsonResponse;
 import com.infox.messagebook.services.ImageService;
 import com.infox.messagebook.utils.EventManager;
-import com.infox.messagebook.utils.ResizeImage;
+ 
 import com.infox.messagebook.utils.SysUtil;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
