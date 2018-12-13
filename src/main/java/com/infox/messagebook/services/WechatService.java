@@ -48,6 +48,17 @@ public class WechatService {
         String FromUserName = map.get("FromUserName");
         String Content = map.get("Content");
 
+        if (Content.startsWith("?")) {
+            return new TextMessageUtil().initMessage(FromUserName,ToUserName,"1. 回复[1] 获取消息列表\r\n 2. 回复[2] 获取图片列表");
+        }
+
+        if (Content.equals("1") || Content.startsWith("1-")) {
+            return new TextMessageUtil().initMessage(FromUserName,ToUserName,"http://www.message6.com/");
+        }
+        if (Content.equals("2") || Content.startsWith("2-")) {
+            return new TextMessageUtil().initMessage(FromUserName,ToUserName,"http://www.message6.com/files.html");
+        }
+
         XMessage xMessage = new XMessage();
         xMessage.setTime(new Date());
         xMessage.setContent(Content);
