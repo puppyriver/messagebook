@@ -3,6 +3,7 @@ package com.infox.messagebook.repository;
 import com.infox.messagebook.model.XMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,5 +20,6 @@ import java.util.List;
 @Transactional
 public interface XMessageRepository extends JpaRepository<XMessage, Long> {
     XMessage findById(Long id);
+    List<XMessage> findAllByCategory(String category, Sort sort);
 //    List<XMessage> findAll() ;
 }
