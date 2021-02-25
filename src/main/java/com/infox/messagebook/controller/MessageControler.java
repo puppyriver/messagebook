@@ -1,6 +1,8 @@
 package com.infox.messagebook.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.infox.messagebook.api.JsonResponse;
+import com.infox.messagebook.model.BMessage;
 import com.infox.messagebook.model.XMessage;
 import com.infox.messagebook.repository.XMessageRepository;
 import org.slf4j.Logger;
@@ -8,6 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
@@ -74,6 +79,29 @@ public class MessageControler {
             logger.error(e.getMessage(), e);
         }
         return null;
+    }
+
+    @RequestMapping(value = "list", method = {POST,GET})
+    public @ResponseBody
+    JsonResponse list(@RequestParam(defaultValue = "1") int page, Model model ) {
+//        XMessage message = new XMessage();
+//        message.setId(1l);
+//        message.setContent("ronnieronnie");
+//        List list = Arrays.asList(message);
+//
+//        return list;
+        PageRequest pageable = new PageRequest(0, 100, Sort.Direction.DESC, "time");
+        Page<XMessage> xMessages = xMessageRepository.findAll(pageable);
+        List<BMessage> bcontent = xMessages.getContent().stream().map(x -> {
+            BMessage bMessage = new BMessage();
+            bMessage.setContent(x.getContent());
+            bMessage.setType(x.getType() + "");
+            bMessage.setCreateTime(x.getTime());
+            bMessage.setTime(x.getTime());
+            return bMessage;
+        }).collect(Collectors.toList());
+
+        return JsonResponse.SUCCESS(new PageImpl(bcontent,pageable,xMessages.getTotalElements()));
     }
 
     
