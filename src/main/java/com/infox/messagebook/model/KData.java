@@ -8,7 +8,15 @@ public class KData extends XObject {
     private String kname;
     private String kvalue;
     private Date time;
+    private String ktype;
 
+    public String getKtype() {
+        return ktype;
+    }
+
+    public void setKtype(String ktype) {
+        this.ktype = ktype;
+    }
 
     public Date getTime() {
         return time;

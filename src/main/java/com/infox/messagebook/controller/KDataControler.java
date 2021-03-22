@@ -51,7 +51,7 @@ public class KDataControler {
 
     @RequestMapping(value = "save", method = {POST,GET})
     public @ResponseBody
-    KData save(String kname, String kvalue ) {
+    KData save(String kname, String kvalue ,String ktype) {
         if (kname == null || kname.trim().isEmpty()) {
             throw new RuntimeException("kname can not be null or empty");
         }
@@ -61,6 +61,7 @@ public class KDataControler {
             kData.setKname(kname);
         }
         kData.setKvalue(kvalue);
+        kData.setKtype(ktype);
         kData.setTime(new Date());
         return kDataRepository.save(kData);
     }
