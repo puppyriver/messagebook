@@ -4,6 +4,7 @@
         <!--<provider>org.hibernate.ejb.HibernatePersistence</provider>-->
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>com.infox.messagebook.model.XMessage</class>
+        <class>com.infox.messagebook.model.KData</class>
 
 
         <!--<class>com.alcatelsbell.nms.valueobject.domain.PhoneBillRule</class>-->
