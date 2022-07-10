@@ -15,14 +15,18 @@ export default class MessageBookMain extends React.Component {
 
     state = {
         messages : [] ,
+        bookmarks : [],
         editMessage : {
 
         }
     };
 
     componentWillMount() {
-        Ajax.post("ajax/message/all?page=234",{page : '111'},result=>{
-            this.setState({messages : result})
+        Ajax.post("ajax/message/list?page=234",{page : '111'},result=>{
+            this.setState({messages : result.data})
+        })
+        Ajax.post("ajax/message/listBookMarks?page=234",{page : '111'},result=>{
+            this.setState({bookmarks : result.data})
         })
         // $.post("ajax/sys/queryUserRoles",{},
         //     (result) =>{
@@ -64,6 +68,11 @@ export default class MessageBookMain extends React.Component {
                 <h1 className="nav-logo">Message Book</h1>
                 <a className="nav-item" href="index.html">笔记管理</a>
                 <a className="nav-item" href="files.html">文件管理</a>
+            </div>
+            <div id={"bookmarks"} style={{marginTop : 10}}   className="row" >
+                {
+                    this.state.bookmarks.map(b=><a href={b.url}>{b.tag}</a>)
+                }
             </div>
             <div style={{marginTop : 10}}   className="row">
                 <div className="col-1">

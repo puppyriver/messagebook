@@ -60,6 +60,13 @@ public class MessageControler {
             message = URLDecoder.decode(message,"utf-8");
             XMessage xmessage = objectMapper.readValue(message,XMessage.class);
             xmessage.setTime(new Date());
+            if (xmessage.getContent().contains("##") && xmessage.getContent().split("##").length == 3) {
+                String href = xmessage.getContent().split("##")[2];
+                xmessage.setUri(href);
+                xmessage.setCategory(xmessage.getContent().split("##")[1]);
+                xmessage.setTag(xmessage.getContent().split("##")[0]);
+                xmessage.setType(6);
+            }
             return xMessageRepository.save(xmessage);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
@@ -92,17 +99,48 @@ public class MessageControler {
 //        return list;
         PageRequest pageable = new PageRequest(0, 100, Sort.Direction.DESC, "time");
         Page<XMessage> xMessages = xMessageRepository.findAll(pageable);
-        List<BMessage> bcontent = xMessages.getContent().stream().map(x -> {
-            BMessage bMessage = new BMessage();
-            bMessage.setContent(x.getContent());
-            bMessage.setType(x.getType() + "");
-            bMessage.setCreateTime(x.getTime());
-            bMessage.setTime(x.getTime());
-            return bMessage;
-        }).collect(Collectors.toList());
+//        List<BMessage> bcontent = xMessages.getContent().stream().map(x -> {
+//            BMessage bMessage = new BMessage();
+//            bMessage.setContent(x.getContent());
+//            bMessage.setType(x.getType() + "");
+//            bMessage.setCreateTime(x.getTime());
+//            bMessage.setUrl(bMessage.getUrl());
+//            bMessage.setTag(bMessage.getTag());
+//            bMessage.setTime(x.getTime());
+//            return bMessage;
+//        }).collect(Collectors.toList());
 
-        return JsonResponse.SUCCESS(new PageImpl(bcontent,pageable,xMessages.getTotalElements()));
+
+        return JsonResponse.SUCCESS(xMessages.getContent());
     }
 
-    
+    @RequestMapping(value = "listBookMarks", method = {POST,GET})
+    public @ResponseBody
+    JsonResponse listBookMarks(@RequestParam(defaultValue = "1") int page, Model model ) {
+//        XMessage message = new XMessage();
+//        message.setId(1l);
+//        message.setContent("ronnieronnie");
+//        List list = Arrays.asList(message);
+//
+//        return list;
+        PageRequest pageable = new PageRequest(0, 100, Sort.Direction.DESC, "time");
+        Page<XMessage> xMessages = xMessageRepository.findByType(6,pageable);
+//        List<BMessage> bcontent = xMessages.getContent().stream().map(x -> {
+//            BMessage bMessage = new BMessage();
+//            bMessage.setContent(x.getContent());
+//            bMessage.setType(x.getType() + "");
+//            bMessage.setCreateTime(x.getTime());
+//            bMessage.setUrl(x.getUri());
+//            bMessage.setTag(x.getTag());
+//
+//            bMessage.setTime(x.getTime());
+//            return bMessage;
+//        }).collect(Collectors.toList());
+
+        return JsonResponse.SUCCESS(xMessages.getContent());
+//        return JsonResponse.SUCCESS(new PageImpl(bcontent,pageable,xMessages.getTotalElements()));
+    }
+
+
+
 }
